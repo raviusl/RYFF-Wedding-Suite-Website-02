@@ -1,0 +1,283 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-soft-sm: var(--shadow-sm);
+  --shadow-soft-md: var(--shadow-md);
+  --shadow-soft-lg: var(--shadow-lg);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --success: oklch(0.52 0.12 155);
+  --warning: oklch(0.68 0.14 75);
+  --info: oklch(0.55 0.1 250);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --shadow-sm: 0 1px 2px oklch(0.145 0 0 / 4%);
+  --shadow-md: 0 4px 16px oklch(0.145 0 0 / 6%);
+  --shadow-lg: 0 12px 40px oklch(0.145 0 0 / 8%);
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.14 0.005 285);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.18 0.005 285);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.18 0.005 285);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.16 0 0);
+  --secondary: oklch(0.24 0.005 285);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.24 0.005 285);
+  --muted-foreground: oklch(0.68 0.01 285);
+  --accent: oklch(0.24 0.005 285);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.65 0.2 22);
+  --success: oklch(0.72 0.14 155);
+  --warning: oklch(0.78 0.12 75);
+  --info: oklch(0.72 0.08 250);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 10%);
+  --ring: oklch(0.55 0.02 250);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 24%);
+  --shadow-md: 0 4px 16px oklch(0 0 0 / 32%);
+  --shadow-lg: 0 12px 40px oklch(0 0 0 / 40%);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.12 0.005 285);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(0.16 0 0);
+  --sidebar-accent: oklch(0.2 0.005 285);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.55 0.02 250);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-transparent font-sans;
+  }
+  body {
+    /* Transparent so fixed RivaBackground (z-0) is visible; canvas comes from the brand layer. */
+    @apply bg-transparent text-foreground;
+  }
+}
+
+/* =========================================================
+   Project 064 / 068 / 068.1 — RIVA OS Brand Experience
+   ========================================================= */
+
+:root {
+  --riva-canvas: #191919;
+  --riva-canvas-warm: #1c1b1a;
+  --riva-surface: rgba(255, 255, 255, 0.028);
+  --riva-surface-strong: rgba(255, 255, 255, 0.04);
+  --riva-border: rgba(255, 255, 255, 0.07);
+  --riva-border-strong: rgba(255, 255, 255, 0.11);
+  --riva-shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.18);
+  --riva-shadow-card: 0 8px 28px rgba(0, 0, 0, 0.14);
+  --riva-radius-md: 0.875rem;
+  --riva-radius-lg: 1.25rem;
+  --riva-radius-xl: 1.5rem;
+  --riva-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --riva-motion: 200ms;
+  --riva-motion-fast: 160ms;
+  --riva-motion-slow: 280ms;
+  /* Ink texture — readable silhouette behind glass (Project 068) */
+  --riva-ink-opacity: 0.72;
+  --riva-ink-blur: 10px;
+}
+
+.riva-glass {
+  background: rgba(25, 25, 25, 0.22);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.riva-surface {
+  border: 1px solid var(--riva-border);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: var(--riva-shadow-soft);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.riva-surface-soft {
+  border: 1px solid var(--riva-border);
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: var(--riva-shadow-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.riva-card {
+  border: 1px solid var(--riva-border);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: var(--riva-shadow-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition:
+    border-color var(--riva-motion) var(--riva-ease),
+    background-color var(--riva-motion) var(--riva-ease),
+    transform var(--riva-motion) var(--riva-ease);
+}
+
+.riva-card:hover {
+  border-color: rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.riva-page {
+  animation: riva-page-enter var(--riva-motion) var(--riva-ease) both;
+}
+
+@keyframes riva-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Design Language — quiet tables in OS chrome */
+.dark [data-slot="table"] {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dark [data-slot="table-row"] {
+  border-color: rgba(255, 255, 255, 0.05);
+  transition: background-color var(--riva-motion) var(--riva-ease);
+}
+
+.dark [data-slot="table-head"] {
+  height: 2.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+}
+
+.dark [data-slot="table-cell"] {
+  padding-top: 0.95rem;
+  padding-bottom: 0.95rem;
+}
+
+/* Project 057 — OS entry transitions */
+@keyframes os-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.os-enter {
+  animation: os-enter var(--riva-motion) var(--riva-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-enter,
+  .riva-page,
+  .riva-card {
+    animation: none;
+    transition: none;
+  }
+
+  .riva-card:hover {
+    transform: none;
+  }
+}
