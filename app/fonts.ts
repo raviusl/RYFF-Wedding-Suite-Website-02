@@ -1,32 +1,23 @@
-import { Carlito, Cormorant_Garamond, Great_Vibes } from "next/font/google";
+import { Cormorant_Garamond, Montserrat, Alex_Brush } from "next/font/google";
 
-/**
- * FINAL approved wedding typography.
- * Couple names must use Great Vibes (luxury script).
- * Display headings use Cormorant Garamond (editorial serif).
- */
-export const greatVibes = Great_Vibes({
-  variable: "--font-great-vibes",
+export const fontSans = Montserrat({
   subsets: ["latin"],
-  weight: "400",
+  variable: "--font-sans",
   display: "swap",
-  preload: true,
-  adjustFontFallback: false,
-  fallback: ["cursive"],
 });
 
-export const cormorantGaramond = Cormorant_Garamond({
-  variable: "--font-cormorant",
+export const fontSerif = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
   display: "swap",
-  preload: true,
 });
 
-export const carlito = Carlito({
-  variable: "--font-carlito",
+// 匹配 Madelyn 风格的高级手写连笔签名体
+export const fontScript = Alex_Brush({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400"],
+  variable: "--font-script",
   display: "swap",
-  preload: true,
 });
