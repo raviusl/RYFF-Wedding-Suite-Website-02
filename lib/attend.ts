@@ -3,6 +3,7 @@ export type AttendPayload = {
   phoneNumber: string;
   guests: string;
   timestamp: string;
+  blessing?: string;
 };
 
 export type AttendErrorCode = "not_configured" | "invalid" | "remote";
@@ -41,7 +42,7 @@ export async function submitAttendance(payload: AttendPayload) {
       phoneNumber: payload.phoneNumber,
       email: "",
       guests: payload.guests,
-      blessing: "",
+      blessing: payload.blessing ?? "",
       timestamp: payload.timestamp,
     }),
   });

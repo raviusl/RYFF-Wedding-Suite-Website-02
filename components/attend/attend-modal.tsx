@@ -1,174 +1,272 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+
+import { useAttendModal } from "@/components/attend/attend-context";
 import { wedding } from "@/content/wedding";
+import { AttendError, submitAttendance } from "@/lib/attend";
+import { cn } from "@/lib/cn";
 
-export interface AttendModalProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-}
+type Status = "idle" | "loading" | "success" | "error";
+type Attendance = "attending" | "declined";
 
-export function AttendModal({ isOpen = true, onClose }: AttendModalProps) {
-  const [internalOpen, setInternalOpen] = useState(true);
-  const [attendance, setAttendance] = useState<"attending" | "declined">("attending");
+const guestOptions =
+  wedding.attend.guestOptions ?? ["1 Guest", "2 Guests", "3 Guests", "4 Guests"];
+
+const fieldClass =
+  "w-full border border-[#c4a8aa]/20 bg-[#0c0405]/60 px-4 py-2 text-sm text-[#f2ebe1] outline-none transition-colors focus:border-[#c4a8aa]/60";
+
+export function AttendModal() {
+  const { open, closeModal } = useAttendModal();
+  const titleId = useId();
+  const firstFieldRef = useRef<HTMLInputElement>(null);
+  const [attendance, setAttendance] = useState<Attendance>("attending");
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
-  const [pax, setPax] = useState("1 Guest");
+  const [pax, setPax] = useState(guestOptions[0] ?? "1 Guest");
   const [dietary, setDietary] = useState("");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [note, setNote] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [feedback, setFeedback] = useState("");
 
-  const show = isOpen && internalOpen;
-  if (!show) return null;
+  useEffect(() => {
+    if (!open) return;
 
-  const handleClose = () => {
-    setInternalOpen(false);
-    if (onClose) onClose();
-  };
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    firstFieldRef.current?.focus();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-
-    setStatus("loading");
-
-    const webhookUrl = (wedding.attend as any)?.googleSheetWebhook;
-    const payload = {
-      project: wedding.groom + " & " + wedding.bride,
-      name: name.trim(),
-      contact: contact.trim(),
-      attendance: attendance === "attending" ? "Attending" : "Declined",
-      pax: attendance === "attending" ? pax : "0",
-      dietary: dietary.trim() || "None",
-      message: message.trim() || "None",
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeModal();
     };
 
-    try {
-      if (webhookUrl && webhookUrl.startsWith("http")) {
-        await fetch(webhookUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
-      setStatus("success");
-    } catch {
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, closeModal]);
+
+  if (!open) return null;
+
+  const isSubmitting = status === "loading";
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    if (!name.trim() || !contact.trim()) {
       setStatus("error");
+      setFeedback("Please complete every required field.");
+      return;
+    }
+
+    setStatus("loading");
+    setFeedback("");
+
+    const wishes = [dietary.trim(), note.trim()].filter(Boolean).join(" · ");
+
+    try {
+      await submitAttendance({
+        fullName: name.trim(),
+        phoneNumber: contact.trim(),
+        guests: attendance === "attending" ? pax : "0",
+        timestamp: new Date().toISOString(),
+        blessing: wishes,
+      });
+      setStatus("success");
+      setFeedback("");
+    } catch (error) {
+      setStatus("error");
+      setFeedback(
+        error instanceof AttendError
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0c0405]/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg rounded-sm bg-[#150608] border border-[#c4a8aa]/20 p-8 sm:p-10 shadow-2xl my-auto">
+    <div className="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-[#0c0405]/85 p-4 backdrop-blur-md sm:p-6">
+      <button
+        type="button"
+        className="absolute inset-0"
+        aria-label="Close"
+        onClick={closeModal}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative z-10 my-auto w-full max-w-lg rounded-sm border border-[#c4a8aa]/20 bg-[#150608] p-8 shadow-2xl sm:p-10"
+      >
         <button
           type="button"
-          onClick={handleClose}
-          className="absolute top-5 right-5 text-xs tracking-widest text-[#c4b3a8]/60 hover:text-[#f2ebe1] uppercase transition-colors cursor-pointer"
+          onClick={closeModal}
+          className="absolute top-5 right-5 cursor-pointer text-xs tracking-widest text-[#c4b3a8]/60 uppercase transition-colors hover:text-[#f2ebe1]"
         >
-          Close [✕]
+          Close
         </button>
 
         {status === "success" ? (
-          <div className="py-10 text-center space-y-4">
-            <p className="kicker tracking-[0.35em] text-[10px] uppercase text-[#c4a8aa]">Received</p>
-            <h3 className="font-serif text-3xl text-[#f2ebe1] font-light">Thank you, {name}.</h3>
-            <p className="text-xs text-[#c4b3a8]/70 tracking-wider">Your response has been recorded.</p>
+          <div className="space-y-4 py-10 text-center">
+            <p className="kicker text-[10px] tracking-[0.35em] text-[#c4a8aa] uppercase">
+              Received
+            </p>
+            <h3 className="font-serif text-3xl font-light text-[#f2ebe1]">
+              Thank you, {name}.
+            </h3>
+            <p className="text-xs tracking-wider text-[#c4b3a8]/70">
+              Your response has been recorded.
+            </p>
             <button
               type="button"
-              onClick={handleClose}
-              className="mt-6 px-8 py-2.5 border border-[#c4a8aa]/30 text-[11px] uppercase tracking-[0.25em] text-[#f2ebe1] hover:bg-[#c4a8aa]/10 transition-colors cursor-pointer"
+              onClick={closeModal}
+              className="mt-6 cursor-pointer border border-[#c4a8aa]/30 px-8 py-2.5 text-[11px] tracking-[0.25em] text-[#f2ebe1] uppercase transition-colors hover:bg-[#c4a8aa]/10"
             >
               Done
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="text-center space-y-1">
-              <p className="kicker tracking-[0.35em] text-[10px] uppercase text-[#c4a8aa]">RSVP</p>
-              <h3 className="font-serif italic text-3xl text-[#f2ebe1] font-light">RSVP & Attendance</h3>
-              <p className="text-[11px] uppercase tracking-[0.25em] text-[#c4b3a8]/60 pt-1">Kindly respond before 1st October 2026</p>
+            <div className="space-y-1 text-center">
+              <p className="kicker text-[10px] tracking-[0.35em] text-[#c4a8aa] uppercase">
+                RSVP
+              </p>
+              <h3
+                id={titleId}
+                className="font-serif text-3xl font-light text-[#f2ebe1] italic"
+              >
+                {wedding.attend.modalTitle}
+              </h3>
+              <p className="pt-1 text-[11px] tracking-[0.25em] text-[#c4b3a8]/60 uppercase">
+                {wedding.attend.deadline}
+              </p>
             </div>
+
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setAttendance("attending")}
-                className={"py-2.5 text-xs uppercase tracking-[0.2em] border transition-all cursor-pointer " + (attendance === "attending" ? "border-[#c4a8aa] bg-[#c4a8aa]/15 text-[#f2ebe1]" : "border-[#c4a8aa]/20 text-[#c4b3a8]/50")}
+                className={cn(
+                  "cursor-pointer border py-2.5 text-xs tracking-[0.2em] uppercase transition-all",
+                  attendance === "attending"
+                    ? "border-[#c4a8aa] bg-[#c4a8aa]/15 text-[#f2ebe1]"
+                    : "border-[#c4a8aa]/20 text-[#c4b3a8]/50",
+                )}
               >
                 Accepts
               </button>
               <button
                 type="button"
                 onClick={() => setAttendance("declined")}
-                className={"py-2.5 text-xs uppercase tracking-[0.2em] border transition-all cursor-pointer " + (attendance === "declined" ? "border-[#c4a8aa] bg-[#c4a8aa]/15 text-[#f2ebe1]" : "border-[#c4a8aa]/20 text-[#c4b3a8]/50")}
+                className={cn(
+                  "cursor-pointer border py-2.5 text-xs tracking-[0.2em] uppercase transition-all",
+                  attendance === "declined"
+                    ? "border-[#c4a8aa] bg-[#c4a8aa]/15 text-[#f2ebe1]"
+                    : "border-[#c4a8aa]/20 text-[#c4b3a8]/50",
+                )}
               >
                 Declines
               </button>
             </div>
+
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">Your Full Name *</label>
+              <label className="mb-1.5 block text-[10px] tracking-[0.25em] text-[#c4b3a8]/70 uppercase">
+                Your Full Name *
+              </label>
               <input
+                ref={firstFieldRef}
                 type="text"
+                name="fullName"
+                autoComplete="name"
                 required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Ravius"
-                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60"
+                onChange={(event) => setName(event.target.value)}
+                disabled={isSubmitting}
+                className={fieldClass}
               />
             </div>
+
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">Contact Number</label>
+              <label className="mb-1.5 block text-[10px] tracking-[0.25em] text-[#c4b3a8]/70 uppercase">
+                Contact Number *
+              </label>
               <input
                 type="tel"
+                name="phoneNumber"
+                autoComplete="tel"
+                required
                 value={contact}
-                onChange={(e) => setContact(e.target.value)}
-                placeholder="e.g. 0182129479"
-                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60"
+                onChange={(event) => setContact(event.target.value)}
+                disabled={isSubmitting}
+                className={fieldClass}
               />
             </div>
-            {attendance === "attending" && (
+
+            {attendance === "attending" ? (
               <>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">Guest Pax</label>
+                  <label className="mb-1.5 block text-[10px] tracking-[0.25em] text-[#c4b3a8]/70 uppercase">
+                    Guest Pax
+                  </label>
                   <select
+                    name="guests"
                     value={pax}
-                    onChange={(e) => setPax(e.target.value)}
-                    className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60"
+                    onChange={(event) => setPax(event.target.value)}
+                    disabled={isSubmitting}
+                    className={cn(fieldClass, "appearance-none")}
                   >
-                    {((wedding.attend as any)?.guestOptions || ["1 Guest", "2 Guests", "3 Guests", "4 Guests"]).map((opt: string) => (
-                      <option key={opt} value={opt} className="bg-[#150608] text-[#f2ebe1]">{opt}</option>
+                    {guestOptions.map((option) => (
+                      <option key={option} value={option} className="bg-[#150608] text-[#f2ebe1]">
+                        {option}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">Dietary Requirements (Optional)</label>
+                  <label className="mb-1.5 block text-[10px] tracking-[0.25em] text-[#c4b3a8]/70 uppercase">
+                    Dietary Requirements (Optional)
+                  </label>
                   <input
                     type="text"
+                    name="dietary"
                     value={dietary}
-                    onChange={(e) => setDietary(e.target.value)}
-                    placeholder="Vegetarian, Halal, Allergies, etc."
-                    className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60"
+                    onChange={(event) => setDietary(event.target.value)}
+                    disabled={isSubmitting}
+                    className={fieldClass}
                   />
                 </div>
               </>
-            )}
+            ) : null}
+
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">Warm Wishes / Notes (Optional)</label>
+              <label className="mb-1.5 block text-[10px] tracking-[0.25em] text-[#c4b3a8]/70 uppercase">
+                Warm Wishes / Notes (Optional)
+              </label>
               <textarea
+                name="message"
                 rows={2}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Leave a note for Roy & MJ..."
-                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60 resize-none"
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                disabled={isSubmitting}
+                className={cn(fieldClass, "resize-none")}
               />
             </div>
+
             <button
               type="submit"
-              disabled={status === "loading"}
-              className="w-full py-3 bg-[#c4a8aa] hover:bg-[#d4b8ba] text-[#0c0405] text-xs uppercase tracking-[0.25em] font-medium transition-colors disabled:opacity-50 mt-2 cursor-pointer"
+              disabled={isSubmitting}
+              className="mt-2 w-full cursor-pointer bg-[#c4a8aa] py-3 text-xs font-medium tracking-[0.25em] text-[#0c0405] uppercase transition-colors hover:bg-[#d4b8ba] disabled:opacity-50"
             >
-              {status === "loading" ? "Submitting..." : "Send RSVP"}
+              {isSubmitting ? "Submitting..." : "Send RSVP"}
             </button>
+
+            {feedback ? (
+              <p role="status" aria-live="polite" className="text-center text-sm text-[#c4a8aa]">
+                {feedback}
+              </p>
+            ) : null}
           </form>
         )}
       </div>
