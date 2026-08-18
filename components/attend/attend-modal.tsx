@@ -11,6 +11,7 @@ interface AttendModalProps {
 export function AttendModal({ isOpen, onClose }: AttendModalProps) {
   const [attendance, setAttendance] = useState<"attending" | "declined">("attending");
   const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
   const [pax, setPax] = useState("1 Guest");
   const [dietary, setDietary] = useState("");
   const [message, setMessage] = useState("");
@@ -26,8 +27,9 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
 
     const webhookUrl = (wedding.attend as any)?.googleSheetWebhook;
     const payload = {
-      project: `${wedding.groom} & ${wedding.bride}`,
+      projecwedding.groom} & ${wedding.bride}`,
       name: name.trim(),
+      contact: contact.trim(),
       attendance: attendance === "attending" ? "Attending" : "Declined",
       pax: attendance === "attending" ? pax : "0",
       dietary: dietary.trim() || "None",
@@ -50,8 +52,8 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0c0405]/85 backdrop-blur-md">
-      <div className="relative w-full max-w-lg rounded-sm bg-[#150608] border border-[#c4a8aa]/20 p-8 sm:p-10 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0c0405]/85 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-lg rounded-sm bg-[#150608] border border-[#c4a8aa]/20 p-8 sm:p-10 shadow-2xl my-auto">
         <button
           type="button"
           onClick={onClose}
@@ -80,18 +82,22 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="text-center space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="text-center space-y-1">
               <p className="kicker tracking-[0.35em] text-[10px] uppercase text-[#c4a8aa]">
-                RSVP
+                Please confirm your presence with us
               </p>
-              <h3 className="font-serif text-2xl sm:text-3xl text-[#f2ebe1] font-light">
-                {(wedding.attend as any)?.modalTitle || "Join the Celebration"}
+              <h3 className="font-serif italic text-3xl text-[#f2ebe1] font-light">
+                RSVP & Attendance
               </h3>
+              <p className="text-[11px] uppercase tracking-[0.25em] text-[#c4b3a8]/60 pt-2">
+                Kindly respond before 1st October 2026
+              </p>
             </div>
 
-            {/* 出席状态切换 */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="w-12 h-px bg-[#c4a8aa]/25 mx-auto my-4" />
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
               <button
                 type="button"
                 onClick={() => setAttendance("attending")}
@@ -116,9 +122,8 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
               </button>
             </div>
 
-            {/* 姓名输入 */}
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-2">
+              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">
                 Your Full Name *
               </label>
               <input
@@ -126,22 +131,34 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Marcus & Sarah"
-                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2.5 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60"
+              placeholder="e.g. Ravius"
+                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">
+                Contact Number
+              </label>
+              <input
+                type="tel"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                placeholder="e.g. 0182129479"
+                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60"
               />
             </div>
 
             {attendance === "attending" && (
               <>
-                {/* 人数选择 */}
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-2">
-                    Number of Guests
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">
+                    Guest Pax
                   </label>
                   <select
                     value={pax}
                     onChange={(e) => setPax(e.target.value)}
-                    className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2.5 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60"
+                    className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] focus:outline-none focus:border-[#c4a8aa]/60"
                   >
                     {((wedding.attend as any)?.guestOptions || ["1 Guest", "2 Guests", "3 Guests", "4 Guests"]).map((opt: string) => (
                       <option key={opt} value={opt} className="bg-[#150608] text-[#f2ebe1]">
@@ -151,9 +168,8 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
                   </select>
                 </div>
 
-                {/* 饮食要求 */}
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-2">
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">
                     Dietary Requirements (Optional)
                   </label>
                   <input
@@ -161,31 +177,29 @@ export function AttendModal({ isOpen, onClose }: AttendModalProps) {
                     value={dietary}
                     onChange={(e) => setDietary(e.target.value)}
                     placeholder="Vegetarian, Halal, Allergies, etc."
-                    className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2.5 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60"
+                    className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60"
                   />
                 </div>
               </>
             )}
 
-            {/* 寄语留言 */}
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-2">
+              <label className="block text-[10px] uppercase tracking-[0.25em] text-[#c4b3a8]/70 mb-1.5">
                 Warm Wishes / Notes (Optional)
               </label>
               <textarea
                 rows={2}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Leave a message for the couple..."
-                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2.5 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60 resize-none"
+                placeholder="Leave a note for Roy & MJ..."
+                className="w-full bg-[#0c0405]/60 border border-[#c4a8aa]/20 px-4 py-2 text-sm text-[#f2ebe1] placeholder-[#c4b3a8]/30 focus:outline-none focus:border-[#c4a8aa]/60 resize-none"
               />
             </div>
 
-            {/* 提交按钮 */}
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full py-3 bg-[#c4a8aa] hover:bg-[#d4b8ba] text-[#0c0405] text-xs uppercase tracking-[0.25em] font-medium transition-colors disabled:opacity-50"
+              className="w-full py-3 bg-[#c4a8aa] hover:bg-[#d4b8ba] text-[#0c0405] text-xs uppercase tracking-[0.25em] font-medium transition-colors disabled:opacity-50 mt-4 cursor-pointer"
             >
               {status === "loading" ? "Submitting..." : "Send RSVP"}
             </button>
