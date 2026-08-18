@@ -1,5 +1,4 @@
 export const wedding = {
-  // 1. 基础新人信息
   groom: "Roy",
   bride: "MJ",
   monogram: "R & M",
@@ -11,12 +10,10 @@ export const wedding = {
   city: "Petaling Jaya",
   googleMapsUrl: "https://maps.google.com",
 
-  // 2. 倒计时与时区
   countdownAt: "2026-11-22T18:30:00+08:00",
   timezone: "Asia/Kuala_Lumpur",
   targetDate: "2026-11-22T18:30:00",
 
-  // 3. 专属 Logo 与 背景音乐
   logoImage: "/images/logo.png",
   music: {
     src: "/audio/wedding.mp3",
@@ -27,8 +24,9 @@ export const wedding = {
     title: "Cinematic Soundtrack",
   },
 
-  // 4. RSVP 与专属 Google Sheets 绑定
+  // 永久全公开 RSVP 配置（确保 isOpen 为 true）
   attend: {
+    isOpen: true,
     title: "Your Presence",
     subtitle: "We hope you will be there.",
     modalTitle: "RSVP & Attendance",
@@ -37,11 +35,9 @@ export const wedding = {
     acceptLabel: "Joyfully Accept",
     declineLabel: "Regretfully Decline",
     guestOptions: ["1 Guest", "2 Guests", "3 Guests", "4 Guests"],
-    // 粘贴你的 Google Apps Script Web app URL：
     googleSheetWebhook: "https://script.google.com/macros/s/AKfycbyE8woa2fHWz-Cp7NJD06bPP-xxxhOSQQqGoSExs3Zec4VMrhFIGOl_hJ_AjVwAwfl1/exec",
   },
 
-  // 5. 爱情故事板块
   portraits: {
     story: "/images/story/story-1.jpeg",
   },
@@ -55,7 +51,6 @@ export const wedding = {
     photo: "/images/story/story-1.jpeg",
   },
 
-  // 6. 流程时间线
   timeline: [
     { time: "6:30 PM", title: "Arrival & Welcome Cocktails", note: "Foyer lounge" },
     { time: "7:30 PM", title: "Grand Entrance & Toast", note: "Main dining hall" },
@@ -63,7 +58,6 @@ export const wedding = {
     { time: "10:00 PM", title: "Dancing & Celebration", note: "Under the lights" },
   ],
 
-  // 7. 细节板块
   details: {
     dressCode: "Formal / Evening Attire",
     attireNote: "Deep burgundy, dark tones, black tie encouraged",
@@ -79,7 +73,6 @@ export const wedding = {
     },
   },
 
-  // 8. 回忆画廊
   gallery: [
     { src: "/images/gallery/images-2.jpeg", label: "PORTRAIT I" },
     { src: "/images/gallery/images-3.jpeg", label: "PORTRAIT II" },
